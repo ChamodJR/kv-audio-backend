@@ -31,10 +31,16 @@ export function getReviews(req,res){
     const user = req.user;
 
     if(user == null || user.role != "admin"){
-        Review.find({isApproved : true}).then((reviews)=>{
+        Review.find({isApproved : true}
+        ).then((reviews)=>{
             res.json(reviews);
-        })
-        return
+         }
+        ).catch(
+            (reviews) => {
+                res.status(500).json({error: "Failed to fecth the reviews"});
+            }
+        );
+        return;
     }
 
     if(user.role == "admin"){
