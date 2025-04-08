@@ -1,5 +1,5 @@
-import e from "express";
 import Product from "../models/product.js"
+import { isItAdmin } from "./userController.js";
 
 export async function addProducts(req, res) {
     if (req.user == null) {
@@ -17,6 +17,12 @@ export async function addProducts(req, res) {
     }
   
     const data = req.body;
+
+    // Ensure isApproved and availability are set, defaulting to true if not provided
+    
+    if (data.availability === undefined) {
+      data.availability = true;
+    }
   
     try {
       // Check if product with the same key already exists
@@ -34,38 +40,89 @@ export async function addProducts(req, res) {
         message: "Product registered successfully",
       });
     } catch (error) {
+      console.error("Error adding product:", error);
       res.status(500).json({
         error: "Product registration failed",
+        details: error.message
       });
     }
   }
   
-
-
-export async function getProducts(req,res){
-
+export async function getProducts(req, res) {
     let isAdmin = false;
-    if(req.user != null && req.user.role === "admin"){
+    if (req.user != null && req.user.role === "admin") {
         isAdmin = true;
     }
-
-    try{
-      
-      if(isAdmin){
+    try {
+      if (isAdmin) {
         // Admins can see all products
         const products = await Product.find();
         res.json(products);
-       return;
-      }else{
-        // Users can only see approved products
-        const products = await Product.find({isApproved : true});
+        return;
+      } else {
+        // Users can only see approved AND available products  
+        const products = await Product.find({ availability: true });
         res.json(products);
         return;
-      } 
-      
-    }catch(e){
+      }
+    } catch (e) {
+      console.error("Error fetching products:", e);
       res.status(500).json({
-        message : "Failed to get products"
-      })
+        message: "Failed to get products",
+        details: e.message
+      });
     }
+}
+
+export async function updateProducts(req,res){
+  try{
+    if(isItAdmin(req)){
+
+      const key = req.params.key;
+
+      const data = req.body;
+    
+      await Product.updateOne({key:key},data)
+
+      res.json({
+        message : "Product updated successfully"
+      })
+      return;
+
+    }else{
+      res.status(403).json({
+        message : "You are not authorized to perform this action"
+      })
+      return;
+    }
+
+  }catch(e){
+    res.status(500).json({
+      message : "Failed to update products"
+    })
+  }
+}
+
+export async function deleteProduct(req,res) {
+  try{
+    if(isItAdmin(req)){
+      const key = req.params.key;
+      await Product.deleteOne({key:key})
+
+      res.json({
+        message : "Product deleted successfully"
+      })
+      return;
+
+    }else{
+      res.status(403).json({
+        message : "You are not authorized to perform this action"
+      })
+      return;
+    }
+  }catch(e){
+    res.status(500).json({
+      message : "Failed to delete products"
+    })
+  }
 }

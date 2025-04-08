@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
         required : true,
         default : "uncategorized" 
     },
-    dimentions : {
+    dimensions : {
         type : String,
         required : true
     },
@@ -33,8 +33,15 @@ const productSchema = new mongoose.Schema({
         required : true,
         default : true
     },
+    image : {
+        type : [String],
+        required : true,
+        default : ["https://as1.ftcdn.net/v2/jpg/04/60/01/36/1000_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg" ,
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTw_HeSzHfBorKS4muw4IIeVvvRgnhyO8Gn8w&s"]
     
+    },
 })
+    
 
 
 
