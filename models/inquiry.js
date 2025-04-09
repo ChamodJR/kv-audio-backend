@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const inquirySchema = new mongoose.schema({
-    Id : {
+const inquirySchema = new mongoose.Schema({
+    id : {
         type : Number,
         required : true,
         unique : true
@@ -22,9 +22,9 @@ const inquirySchema = new mongoose.schema({
         unique : true
     },
     date : {
-        type : Data,
+        type : Date,
         required : true,
-        unique : Date.now()
+        default : Date.now()
     },
     response : {
         type : String,
@@ -34,8 +34,10 @@ const inquirySchema = new mongoose.schema({
     isResolved : {
         type : Boolean,
         required : true,
-        unique : true
+        required : false
     },
 })
 
-const Product = mongoose.model("Inquiry", inquirySchema);
+const Inquiry = mongoose.model("Inquiry", inquirySchema);
+
+export default Inquiry; 
